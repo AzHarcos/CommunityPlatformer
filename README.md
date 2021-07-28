@@ -1,2 +1,2 @@
-# CommunityPlatformer
-Lupus' community-driven platformer. A work-in-progress, currently unfinished.
+# Lupus Community Platformer
+Lupus' community-driven platformer. This is a work-in-progress and currently unfinished.
