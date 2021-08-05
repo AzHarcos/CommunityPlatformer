@@ -6,6 +6,7 @@ public static class PlayerConst {
 
     public const float GRAVITY = 9.81f;
 
-    public const bool THIS_IS_A_TEST_VALUE = true;
+    public const float SNEAKING_ACCEL = 5f;
+    public const float sneakingMaxSpeed = 2f;
 
 }
