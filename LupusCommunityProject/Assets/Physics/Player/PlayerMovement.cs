@@ -32,8 +32,6 @@ public class PlayerMovement : MonoBehaviour {
         float direction = Input.GetAxisRaw("Horizontal");
         UpdateVelocity(direction);
         UpdateAnimations(direction);
-        CheckSurroundings();
-        CheckIfCanJump();
     }
 
     // updates the players x and y velocity
@@ -47,8 +45,9 @@ public class PlayerMovement : MonoBehaviour {
     }
    
     // used to check if the player is touching the ground
-    private void IsGrounded() {
-        return Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, whatIsGround) && (rb.velocity.y <= 0.01f));
+    private bool IsGrounded() {
+        //TODO: change to OverlapBox
+        return Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, whatIsGround) && rb.velocity.y <= 0.01f;
     }
     
     // updates the current animation state
@@ -61,7 +60,7 @@ public class PlayerMovement : MonoBehaviour {
         }
     }
 
-    // draw hitbox sphere for debugging purposes
+    // draw hitbox sphere in scene builder
     private void OnDrawGizmos() {
         Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
     }
