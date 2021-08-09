@@ -11,15 +11,13 @@ public class PlayerMovement : MonoBehaviour {
     private Animator animator;
     // sprite object, used to adjust sprite
     private SpriteRenderer spriteRenderer;
-    // used to check if the player is touching the ground
-    private bool onGround;
-    private bool canJump;
-
+    // secondary hitbox for collision detection
     public Transform groundCheck;
-
+    // ground layer, everything you can jump of
+    public LayerMask whatIsGround;
+    // radius used to check collision, value is set in Unity
     public float groundCheckRadius;
 
-    public LayerMask whatIsGround;
     // Start is called before the first frame update
     void Start() {
         rb = GetComponent<Rigidbody2D>();
@@ -42,23 +40,17 @@ public class PlayerMovement : MonoBehaviour {
     private void UpdateVelocity(float direction) {
         float velocityX = direction * PlayerConst.SNEAKING_ACCEL;
         float velocityY = rb.velocity.y;
-        if (Input.GetButtonDown("Jump") && canJump) {
+        if (Input.GetButtonDown("Jump") && IsGrounded()) {
             velocityY = PlayerConst.JUMP_ACCEL;
-            }
+        }
         rb.velocity = new Vector2(velocityX, velocityY);
     }
-    private void CheckSurroundings() {
-        onGround = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, whatIsGround);
+   
+    // used to check if the player is touching the ground
+    private void IsGrounded() {
+        return Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, whatIsGround) && (rb.velocity.y <= 0.01f));
     }
-
-    private void CheckIfCanJump() {
-        if ((onGround) && (rb.velocity.y <= 0.01f)) {
-            canJump = true;
-        }
-        else {
-            canJump = false;
-        }
-    }
+    
     // updates the current animation state
     private void UpdateAnimations(float direction) {
         if (direction == 0f) {
@@ -69,6 +61,7 @@ public class PlayerMovement : MonoBehaviour {
         }
     }
 
+    // draw hitbox sphere for debugging purposes
     private void OnDrawGizmos() {
         Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
     }
