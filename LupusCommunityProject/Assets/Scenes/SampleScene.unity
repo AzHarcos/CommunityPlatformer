@@ -13051,10 +13051,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   groundCheck: {fileID: 1065830656}
-  groundCheckRadius: 0.5
-  whatIsGround:
+  groundLayer:
     serializedVersion: 2
     m_Bits: 64
+  groundCheckRadius: 0.5
 --- !u!95 &1731410541
 Animator:
   serializedVersion: 3

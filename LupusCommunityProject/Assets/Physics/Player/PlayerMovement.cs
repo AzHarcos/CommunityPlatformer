@@ -14,7 +14,7 @@ public class PlayerMovement : MonoBehaviour {
     // secondary hitbox for collision detection
     public Transform groundCheck;
     // ground layer, everything you can jump of
-    public LayerMask whatIsGround;
+    public LayerMask groundLayer;
     // radius used to check collision, value is set in Unity
     public float groundCheckRadius;
 
@@ -23,7 +23,8 @@ public class PlayerMovement : MonoBehaviour {
 
     // timer used to create higher jumps when holding
     private float jumpHoldTimer;
-    private bool inStartOfJump; 
+    // indicates whether the player is in the ascending phase of a jump
+    private bool isJumping; 
 
     // Start is called before the first frame update
     void Start() {
@@ -50,16 +51,16 @@ public class PlayerMovement : MonoBehaviour {
 
 
         if (Input.GetButtonDown("Jump") && IsGrounded()) {
-            inStartOfJump = true;
+            isJumping = true;
         }
 
-        if (inStartOfJump) {
+        if (isJumping) {
             jumpHoldTimer += Time.deltaTime;
             velocityY = PlayerConst.JUMP_ACCEL;
         }
 
         if (Input.GetButtonUp("Jump") || jumpHoldTimer >= PlayerConst.MAX_JUMP_HOLD_TIME) {
-            inStartOfJump = false;
+            isJumping = false;
             jumpHoldTimer = 0;
         }
 
@@ -69,7 +70,7 @@ public class PlayerMovement : MonoBehaviour {
     // used to check if the player is touching the ground
     private bool IsGrounded() {
         //TODO: change to OverlapBox
-        return Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, whatIsGround) && rb.velocity.y <= 0.01f;
+        return Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer) && rb.velocity.y <= 0.01f;
     }
     
     // updates the current animation state
