@@ -11,6 +11,12 @@ public class PlayerMovement : MonoBehaviour {
     private Animator animator;
     // sprite object, used to adjust sprite
     private SpriteRenderer spriteRenderer;
+    // secondary hitbox for collision detection
+    public Transform groundCheck;
+    // ground layer, everything you can jump of
+    public LayerMask whatIsGround;
+    // radius used to check collision, value is set in Unity
+    public float groundCheckRadius;
 
     // Start is called before the first frame update
     void Start() {
@@ -26,18 +32,25 @@ public class PlayerMovement : MonoBehaviour {
         float direction = Input.GetAxisRaw("Horizontal");
         UpdateVelocity(direction);
         UpdateAnimations(direction);
+        CheckSurroundings();
+        CheckIfCanJump();
     }
 
     // updates the players x and y velocity
     private void UpdateVelocity(float direction) {
         float velocityX = direction * PlayerConst.SNEAKING_ACCEL;
         float velocityY = rb.velocity.y;
-        if (Input.GetButtonDown("Jump")) {
+        if (Input.GetButtonDown("Jump") && IsGrounded()) {
             velocityY = PlayerConst.JUMP_ACCEL;
         }
         rb.velocity = new Vector2(velocityX, velocityY);
     }
-
+   
+    // used to check if the player is touching the ground
+    private void IsGrounded() {
+        return Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, whatIsGround) && (rb.velocity.y <= 0.01f));
+    }
+    
     // updates the current animation state
     private void UpdateAnimations(float direction) {
         if (direction == 0f) {
@@ -46,5 +59,10 @@ public class PlayerMovement : MonoBehaviour {
             animator.SetBool("moving", true);
             spriteRenderer.flipX = direction < 0f;
         }
+    }
+
+    // draw hitbox sphere for debugging purposes
+    private void OnDrawGizmos() {
+        Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
     }
 }
