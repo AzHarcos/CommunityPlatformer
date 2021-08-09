@@ -18,6 +18,13 @@ public class PlayerMovement : MonoBehaviour {
     // radius used to check collision, value is set in Unity
     public float groundCheckRadius;
 
+    // global timer, currently unused
+    private float globalTimer;
+
+    // timer used to create higher jumps when holding
+    private float jumpHoldTimer;
+    private bool inStartOfJump; 
+
     // Start is called before the first frame update
     void Start() {
         rb = GetComponent<Rigidbody2D>();
@@ -28,6 +35,8 @@ public class PlayerMovement : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+
+        globalTimer += Time.deltaTime;
         // gets direction (-1. 0 or 1 on keyboard, any value between -1 and 1 on stick inputs)
         float direction = Input.GetAxisRaw("Horizontal");
         UpdateVelocity(direction);
@@ -38,9 +47,22 @@ public class PlayerMovement : MonoBehaviour {
     private void UpdateVelocity(float direction) {
         float velocityX = direction * PlayerConst.SNEAKING_ACCEL;
         float velocityY = rb.velocity.y;
+
+
         if (Input.GetButtonDown("Jump") && IsGrounded()) {
+            inStartOfJump = true;
+        }
+
+        if (inStartOfJump) {
+            jumpHoldTimer += Time.deltaTime;
             velocityY = PlayerConst.JUMP_ACCEL;
         }
+
+        if (Input.GetButtonUp("Jump") || jumpHoldTimer >= PlayerConst.MAX_JUMP_HOLD_TIME) {
+            inStartOfJump = false;
+            jumpHoldTimer = 0;
+        }
+
         rb.velocity = new Vector2(velocityX, velocityY);
     }
    
