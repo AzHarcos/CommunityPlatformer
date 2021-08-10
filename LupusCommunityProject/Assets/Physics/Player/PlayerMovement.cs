@@ -21,6 +21,10 @@ public class PlayerMovement : MonoBehaviour {
     // global timer, currently unused
     private float globalTimer;
 
+    //player vars
+    private float velocityX;
+
+
     // timer used to create higher jumps when holding
     private float jumpHoldTimer;
     private bool inStartOfJump; 
@@ -45,7 +49,25 @@ public class PlayerMovement : MonoBehaviour {
 
     // updates the players x and y velocity
     private void UpdateVelocity(float direction) {
-        float velocityX = direction * PlayerConst.SNEAKING_ACCEL;
+
+        
+        // velocity increases and isn't set
+        velocityX = Math.Max(Math.Min(velocityX + (direction * PlayerConst.SNEAKING_ACCEL * Time.deltaTime), PlayerConst.SNEAKING_MAX_SPEED), -PlayerConst.SNEAKING_MAX_SPEED);
+        
+        if (direction == 0 && IsGrounded() && velocityX != 0) {
+            if (velocityX > 0) {
+                velocityX -= PlayerConst.SNEAKING_ACCEL * 2 * Time.deltaTime;
+                //avoid wiggeling
+                if (velocityX < 0.1)
+                    velocityX = 0;
+            } else if (velocityX < 0) {
+                velocityX += PlayerConst.SNEAKING_ACCEL * 2 * Time.deltaTime;
+                //avoids wiggeling
+                if (velocityX > 0.1)
+                    velocityX = 0;
+            }
+        }
+
         float velocityY = rb.velocity.y;
 
 
