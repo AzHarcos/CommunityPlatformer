@@ -57,12 +57,12 @@ public class PlayerMovement : MonoBehaviour {
         
         if (direction == 0 && IsGrounded() && velocityX != 0) {
             if (velocityX > 0) {
-                velocityX -= PlayerConst.SNEAKING_ACCEL * 2 * Time.deltaTime;
+                velocityX -= PlayerConst.SNEAKING_DECEL * Time.deltaTime;
                 //avoid wiggeling
                 if (velocityX < 0.1)
                     velocityX = 0;
             } else if (velocityX < 0) {
-                velocityX += PlayerConst.SNEAKING_ACCEL * 2 * Time.deltaTime;
+                velocityX += PlayerConst.SNEAKING_DECEL * Time.deltaTime;
                 //avoids wiggeling
                 if (velocityX > 0.1)
                     velocityX = 0;
