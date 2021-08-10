@@ -15,9 +15,9 @@ public class PlayerMovement : MonoBehaviour {
     public Transform groundCheck;
     // ground layer, everything you can jump of
     public LayerMask groundLayer;
-    // radius used to check collision, value is set in Unity
-    public float groundCheckRadius;
-
+    // size of rectangle used to check collision, value is set in unity
+    [SerializeField]
+    private Vector2 groundCheckSize;
     // global timer, currently unused
     private float globalTimer;
 
@@ -91,8 +91,8 @@ public class PlayerMovement : MonoBehaviour {
    
     // used to check if the player is touching the ground
     private bool IsGrounded() {
-        //TODO: change to OverlapBox
-        return Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer) && rb.velocity.y <= 0.01f;
+        // second box that checks if it overlaps with the ground
+        return Physics2D.OverlapBox(groundCheck.position, groundCheckSize, 0, groundLayer) && rb.velocity.y <= 0.01f;
     }
     
     // updates the current animation state
@@ -105,8 +105,8 @@ public class PlayerMovement : MonoBehaviour {
         }
     }
 
-    // draw hitbox sphere in scene builder
+    // draw hitbox rectangle in scene builder
     private void OnDrawGizmos() {
-        Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+        Gizmos.DrawWireCube(groundCheck.position, groundCheckSize);
     }
 }
