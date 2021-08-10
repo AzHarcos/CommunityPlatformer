@@ -9,6 +9,7 @@ public static class PlayerConst {
 
     // the forces applied when holding a direction
     public const float SNEAKING_ACCEL = 20f;
+    public const float SNEAKING_DECEL = 10f;
     public const float SNEAKING_MAX_SPEED = 10f;
 
     // jump height/speed
