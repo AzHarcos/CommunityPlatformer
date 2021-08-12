@@ -12,18 +12,22 @@ public class PlayerMovement : MonoBehaviour {
     // sprite object, used to adjust sprite
     private SpriteRenderer spriteRenderer;
     // secondary hitbox for collision detection
-    public Transform groundCheck;
+    [SerializeField]
+    private Transform groundCheck;
     // ground layer, everything you can jump of
-    public LayerMask groundLayer;
-    // size of rectangle used to check collision, value is set in unity
+    [SerializeField]
+    private LayerMask groundLayer;
+    // size of rectangle used to check collision
     [SerializeField]
     private Vector2 groundCheckSize;
     // global timer, currently unused
     private float globalTimer;
 
     //player vars
+    private float direction;
     private float velocityX;
-
+    private float velocityY;
+    private bool inShell = true;
 
     // timer used to create higher jumps when holding
     private float jumpHoldTimer;
@@ -40,39 +44,39 @@ public class PlayerMovement : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-
         globalTimer += Time.deltaTime;
         // gets direction (-1. 0 or 1 on keyboard, any value between -1 and 1 on stick inputs)
-        float direction = Input.GetAxisRaw("Horizontal");
-        UpdateVelocity(direction);
-        UpdateAnimations(direction);
+        direction = Input.GetAxisRaw("Horizontal");
+        UpdateVelocity();
+        UpdateAnimations();
     }
 
     // updates the players x and y velocity
-    private void UpdateVelocity(float direction) {
+    private void UpdateVelocity() {
+        float acceleration = inShell ? PlayerConst.CRAWL_ACCEL_SHELL : PlayerConst.CRAWL_ACCEL;
+        float deceleration = inShell ? PlayerConst.CRAWL_DECEL_SHELL : PlayerConst.CRAWL_DECEL;
+        float maxSpeed = inShell ? PlayerConst.CRAWL_MAX_SPEED_SHELL : PlayerConst.CRAWL_MAX_SPEED;
 
-        
         // velocity increases and isn't set
-        velocityX = Math.Max(Math.Min(velocityX + (direction * PlayerConst.SNEAKING_ACCEL * Time.deltaTime), PlayerConst.SNEAKING_MAX_SPEED), -PlayerConst.SNEAKING_MAX_SPEED);
+        velocityX = Math.Max(Math.Min(velocityX + (direction * acceleration * Time.deltaTime), maxSpeed), -maxSpeed);
         
         if (direction == 0 && IsGrounded() && velocityX != 0) {
             if (velocityX > 0) {
-                velocityX -= PlayerConst.SNEAKING_DECEL * Time.deltaTime;
+                velocityX -= deceleration * Time.deltaTime;
                 //avoid wiggeling
                 if (velocityX < 0.1)
                     velocityX = 0;
             } else if (velocityX < 0) {
-                velocityX += PlayerConst.SNEAKING_DECEL * Time.deltaTime;
+                velocityX += deceleration * Time.deltaTime;
                 //avoids wiggeling
                 if (velocityX > 0.1)
                     velocityX = 0;
             }
         }
 
-        float velocityY = rb.velocity.y;
+        velocityY = rb.velocity.y;
 
-
-        if (Input.GetButtonDown("Jump") && IsGrounded()) {
+        if (Input.GetButtonDown("Jump") && IsGrounded() && !inShell) {
             isJumping = true;
         }
 
@@ -92,11 +96,11 @@ public class PlayerMovement : MonoBehaviour {
     // used to check if the player is touching the ground
     private bool IsGrounded() {
         // second box that checks if it overlaps with the ground
-        return Physics2D.OverlapBox(groundCheck.position, groundCheckSize, 0, groundLayer) && rb.velocity.y <= 0.01f;
+        return Physics2D.OverlapBox(groundCheck.position, groundCheckSize, 0, groundLayer);
     }
     
     // updates the current animation state
-    private void UpdateAnimations(float direction) {
+    private void UpdateAnimations() {
         if (direction == 0f) {
             animator.SetBool("moving", false);
         } else {
@@ -105,7 +109,7 @@ public class PlayerMovement : MonoBehaviour {
         }
     }
 
-    // draw hitbox rectangle in scene builder
+    // draw hitboxes in scene builder
     private void OnDrawGizmos() {
         Gizmos.DrawWireCube(groundCheck.position, groundCheckSize);
     }
