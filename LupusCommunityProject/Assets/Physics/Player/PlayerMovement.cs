@@ -27,6 +27,7 @@ public class PlayerMovement : MonoBehaviour {
     private float direction;
     private float velocityX;
     private float velocityY;
+    private bool isFacingRight = true;
     private bool inShell = true;
 
     // timer used to create higher jumps when holding
@@ -104,8 +105,11 @@ public class PlayerMovement : MonoBehaviour {
         if (direction == 0f) {
             animator.SetBool("moving", false);
         } else {
+            if (direction > 0 && !isFacingRight || direction < 0 && isFacingRight) {
+                isFacingRight = !isFacingRight;
+                transform.Rotate(0, 180f, 0);
+            }
             animator.SetBool("moving", true);
-            spriteRenderer.flipX = direction < 0f;
         }
     }
 
