@@ -13,9 +13,9 @@ public static class PlayerConst {
     public const float CRAWL_MAX_SPEED = 10f;
 
     // the forces applied when crawling with the shell
-    public const float CRAWL_ACCEL_SHELL = 10f;
-    public const float CRAWL_DECEL_SHELL = 10f;
-    public const float CRAWL_MAX_SPEED_SHELL = 5f;
+    public const float CRAWL_ACCEL_SHELL = 20f;
+    public const float CRAWL_DECEL_SHELL = 20f;
+    public const float CRAWL_MAX_SPEED_SHELL = 10f;
     
     // jump height/speed
     public const float JUMP_ACCEL = 10f;
