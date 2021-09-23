@@ -7,6 +7,8 @@ public class PlayerMovement : MonoBehaviour {
 
     // physics object, used to set gravity + velocity
     private Rigidbody2D rb;
+	// box collider, snails hitbox
+	private BoxCollider2D boxCollider;
     // animation object, used to set animation flags
     private Animator animator;
     // sprite object, used to adjust sprite
@@ -32,6 +34,15 @@ public class PlayerMovement : MonoBehaviour {
      // offset used to adjust sprite when ending wall climb (climb up ledge)
     [SerializeField]
     private float ledgeClimbOffset;
+	// raycast used to detect slope angle
+    [SerializeField]
+    private Transform slopeCheck;
+    // distance used to detect slope angle
+    [SerializeField]
+    private float slopeCheckDistance;
+	private float slopeAngle;
+	private float slopeAngleOld;
+	private Vector2 slopeNormalPerpendicular;
     // global timer, currently unused
     private float globalTimer;
 
@@ -56,6 +67,7 @@ public class PlayerMovement : MonoBehaviour {
     // Start is called before the first frame update
     void Start() {
         rb = GetComponent<Rigidbody2D>();
+		boxCollider = GetComponent<BoxCollider2D>();
         rb.gravityScale = PlayerConst.GRAVITY;
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -92,12 +104,22 @@ public class PlayerMovement : MonoBehaviour {
         switch (movingOn) {
             // player is moving on the ground -> detect walls or adjust x velocity
             case TerrainType.Ground: {
-                if (IsTouchingWall()) {
+                /*if (IsTouchingWall()) {
                     StartWallClimbing();
-                } else {
+                } else {*/
+					Vector2 checkSlopePos = transform.position;
+					RaycastHit2D hit = Physics2D.Raycast(checkSlopePos, Vector2.down, slopeCheckDistance, groundLayer);
+					slopeNormalPerpendicular = Vector2.Perpendicular(hit.normal).normalized;
+					slopeAngle = Vector2.SignedAngle(hit.normal, Vector2.up);
+					Debug.DrawRay(hit.point, slopeNormalPerpendicular, Color.red);
+					Debug.DrawRay(hit.point, hit.normal, Color.green);
+					if (slopeAngle != slopeAngleOld) {	
+						transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, isFacingRight ? -slopeAngle : slopeAngle);
+					}
+					slopeAngleOld = slopeAngle;
                     velocityY = rb.velocity.y;
                     UpdateVelocityX(invertControls ? -acceleration : acceleration, deceleration, maxSpeed);
-                }
+                //}
                 break;
             }
             // player is moving on a wall -> detect ground or ceiling or adjust y velocity
@@ -285,5 +307,6 @@ public class PlayerMovement : MonoBehaviour {
     private void OnDrawGizmos() {
         Gizmos.DrawWireCube(groundCheck.position, groundCheckSize);
         Gizmos.DrawLine(wallCheck.position, new Vector3(wallCheck.position.x + (isFacingRight ? wallCheckDistance : -wallCheckDistance), wallCheck.position.y, wallCheck.position.z));
+		Gizmos.DrawLine(slopeCheck.position, new Vector3(slopeCheck.position.x, slopeCheck.position.y - slopeCheckDistance, slopeCheck.position.z));
     }
 }
